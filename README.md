@@ -56,3 +56,8 @@ TODO
 ## 🤓 How it works?
 
 TODO
+
+
+## Credits
+
+* Logo generated with [dreamlike.art](https://dreamlike.art/).
