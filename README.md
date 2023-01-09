@@ -2,7 +2,7 @@
     <a href="https://guiferviz.github.io/wire" target="_blank">
         <img src="https://guiferviz.github.io/wire/images/logo.png"
              alt="Wire logo"
-             width="800">
+             width="200">
     </a>
 </p>
 <p align="center">
@@ -35,6 +35,8 @@
 </p>
 
 ---
+
+# Wired NAND
 
 :books: **Documentation**:
 <a href="https://guiferviz.github.io/wire" target="_blank">
