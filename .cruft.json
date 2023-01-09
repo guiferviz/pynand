@@ -1,25 +1,25 @@
 {
-  "template": "https://github.com/guiferviz/template-python/",
-  "commit": "e52aa9f2c8bca2cf16c460f949a7d3f20b40fb09",
-  "checkout": null,
-  "context": {
-    "cookiecutter": {
-      "project_name": "Wire",
-      "project_slug": "wire",
-      "module_name": "wire",
-      "project_short_description": "Logic circuit simulator. Building a computer from NAND gates.",
-      "version": "0.1.0",
-      "full_name": "guiferviz",
-      "email": "guiferviz@gmail.com",
-      "github_username": "guiferviz",
-      "twitter_username": "guiferviz",
-      "linkedin_username": "guiferviz",
-      "pypi_username": "guiferviz",
-      "docker_namespace": "guiferviz",
-      "google_analytics_id": "G-2M3NT726SH",
-      "open_source_license": "MIT License",
-      "_template": "https://github.com/guiferviz/template-python/"
-    }
-  },
-  "directory": null
+    "template": "https://github.com/guiferviz/template-python/",
+    "commit": "0729f5475c13b9899827e7ff131f4f29bbefa3c8",
+    "checkout": null,
+    "context": {
+        "cookiecutter": {
+            "project_name": "Wire",
+            "project_slug": "wire",
+            "module_name": "wire",
+            "project_short_description": "Logic circuit simulator. Building a computer from NAND gates.",
+            "version": "0.1.0",
+            "full_name": "guiferviz",
+            "email": "guiferviz@gmail.com",
+            "github_username": "guiferviz",
+            "twitter_username": "guiferviz",
+            "linkedin_username": "guiferviz",
+            "pypi_username": "guiferviz",
+            "docker_namespace": "guiferviz",
+            "google_analytics_id": "G-2M3NT726SH",
+            "open_source_license": "MIT License",
+            "_template": "https://github.com/guiferviz/template-python/"
+        }
+    },
+    "directory": null
 }
