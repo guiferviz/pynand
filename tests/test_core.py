@@ -1,6 +1,6 @@
 import pytest
 
-from wire.core import (
+from wirednand.core import (
     And,
     Bus,
     Clock,
