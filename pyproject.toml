@@ -1,15 +1,15 @@
 [tool.poetry]
-name = "wire"
+name = "wirednand"
 version = "0.1.0"
 description = "Logic circuit simulator. Building a computer from NAND gates."
 packages = [
-    { include = "wire", from = "src" },
+    { include = "wirednand", from = "src" },
 ]
 authors = ["guiferviz <guiferviz@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-keywords = ["wire"]
-repository = "https://github.com/guiferviz/wire"
+keywords = ["wirednand"]
+repository = "https://github.com/guiferviz/wirednand"
 classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python",
@@ -18,9 +18,9 @@ classifiers = [
 ]
 
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/guiferviz/wire/issues"
-"Source" = "https://github.com/guiferviz/wire"
-"Documentation" = "https://guiferviz.github.io/wire"
+"Bug Tracker" = "https://github.com/guiferviz/wirednand/issues"
+"Source" = "https://github.com/guiferviz/wirednand"
+"Documentation" = "https://guiferviz.github.io/wirednand"
 
 [tool.poetry.group.main.dependencies]
 python = "^3.10"
@@ -53,7 +53,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-"wire" = "wire.__main__:main"
+"wirednand" = "wirednand.__main__:main"
 
 [tool.black]
 line-length = 80

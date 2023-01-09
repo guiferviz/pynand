@@ -1,8 +1,8 @@
-site_name: Wire Docs
-site_url: https://guiferviz.github.io/wire
+site_name: Wired NAND Docs
+site_url: https://guiferviz.github.io/wirednand
 site_author: guiferviz
-repo_url: https://github.com/guiferviz/wire
-repo_name: Wire
+repo_url: https://github.com/guiferviz/wirednand
+repo_name: Wired NAND
 strict: true
 
 theme:

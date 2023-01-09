@@ -1,12 +1,12 @@
 {
     "template": "https://github.com/guiferviz/template-python/",
-    "commit": "6b2b94143438e2df37b6f85f80b35150af6d0bcc",
+    "commit": "1ed2cb4dedb8cc9147a98f507ed75b6733904d90",
     "checkout": null,
     "context": {
         "cookiecutter": {
-            "project_name": "Wire",
-            "project_slug": "wire",
-            "module_name": "wire",
+            "project_name": "Wired NAND",
+            "project_slug": "wirednand",
+            "module_name": "wirednand",
             "project_short_description": "Logic circuit simulator. Building a computer from NAND gates.",
             "version": "0.1.0",
             "full_name": "guiferviz",

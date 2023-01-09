@@ -1,1 +1,1 @@
-"""Unit test package for wire."""
+"""Unit test package for wirednand."""
