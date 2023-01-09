@@ -1,3 +1,6 @@
+# Auto-generated requirements.txt file.
+requirements.txt
+
 # Ignore local env vars (direnv)
 .envrc
 

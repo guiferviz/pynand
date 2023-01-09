@@ -1,4 +1,3 @@
-
 {% macro ep_header(authors=['guiferviz'], status='', created='', version='') -%}
 {{ exception("Unknown status") if status not in ["Planned", "Active", "Deprecated"] else "" }}
 <style>
@@ -42,4 +41,3 @@
     </tr>
 </table>
 {%- endmacro %}
-
