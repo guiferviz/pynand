@@ -1,6 +1,6 @@
 {
     "template": "https://github.com/guiferviz/template-python/",
-    "commit": "6b2b94143438e2df37b6f85f80b35150af6d0bcc",
+    "commit": "1ed2cb4dedb8cc9147a98f507ed75b6733904d90",
     "checkout": null,
     "context": {
         "cookiecutter": {
