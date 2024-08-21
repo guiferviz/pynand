@@ -1,174 +1,118 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from functools import wraps
+from typing import Callable, ParamSpec, TypeVar
+
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
-class Component:
+class ComponentMeta(type):
+    def __call__(cls, *args, **kwargs):
+        instance = super().__call__(*args, **kwargs)
+        if ComponentContext.current_context is not None:
+            ComponentContext.current_context.register(instance)
+        return instance
+
+
+class Wire:
     pass
 
 
-class Wire(Component):
-    def __init__(
-        self, origin: Optional[Component] = None, default: Optional[bool] = None
-    ):
-        self.origin = origin
-        self.default = default
+class Bus:
+    def __init__(self, n_wires=1):
+        if n_wires <= 0:
+            raise ValueError("A bus should have a positive number of wires")
+        self.wires = [Wire() for _ in range(n_wires)]
+
+    def __len__(self):
+        return len(self.wires)
+
+    def __str__(self) -> str:
+        return f"Bus[{len(self)}]"
 
 
-class Bus(Component):
-    def __init__(self, size: int, origin: Optional[Component] = None):
-        self.wires: List[Wire] = [Wire(origin) for _ in range(size)]
-        self.size = size
+class Component(metaclass=ComponentMeta):
+    def __init__(self, name: str, subcomponents: list[Component] | None = None):
+        self.name = name
+        self.inputs: dict[str, Bus] = {}
+        self.outputs: dict[str, Bus] = {}
+        self.subcomponents: list[Component] = subcomponents or []
 
-    def __getitem__(self, wire_index: int):
-        return self.wires[wire_index]
+    def add_input(self, name: str, bus: Bus):
+        self.inputs[name] = bus
 
-    def __setitem__(self, wire_index: int, value: Wire):
-        self.wires[wire_index] = value
+    def add_output(self, name: str, bus: Bus):
+        self.outputs[name] = bus
 
+    def add_subcomponent(self, subcomponent: Component):
+        self.subcomponents.append(subcomponent)
 
-class Nand(Component):
-    def __init__(self, a: Wire, b: Wire):
-        self.a = a
-        self.b = b
-        self.out = Wire(self)
-
-
-class NandBus(Component):
-    def __init__(self, a: Bus, b: Bus):
-        assert a.size == b.size
-        self.a = a
-        self.b = b
-        out = Bus(a.size, self)
-        for i in range(out.size):
-            out[i] = Nand(a[i], b[i]).out
-        self.out = out
-
-
-class Not(Component):
-    def __init__(self, a):
-        nand = Nand(a, a)
-        self.out = nand.out
+    def __str__(self, level=0) -> str:
+        indent = "  " * level
+        inputs_str = ", ".join(self.inputs.keys())
+        outputs_str = ", ".join(self.outputs.keys())
+        subcomponents_str = "\n".join(
+            sub.__str__(level + 1) for sub in self.subcomponents
+        )
+        return (
+            f"{indent}Component(Name: {self.name}, Inputs: [{inputs_str}], Outputs: [{outputs_str}])"
+            + (f",\n{subcomponents_str}" if self.subcomponents else "")
+        )
 
 
-class And(Component):
-    def __init__(self, a, b):
-        nand = Nand(a, b)
-        not_ = Not(nand.out)
-        self.out = not_.out
+class ComponentContext:
+    current_context: ComponentContext | None = None
 
-
-class Or(Component):
-    def __init__(self, a, b):
-        not_a = Not(a)
-        not_b = Not(b)
-        nand = Nand(not_a.out, not_b.out)
-        self.out = nand.out
-
-
-class Xor(Component):
-    def __init__(self, a, b):
-        nand = Nand(a, b)
-        nand_a = Nand(nand.out, a)
-        nand_b = Nand(nand.out, b)
-        last_nand = Nand(nand_a.out, nand_b.out)
-        self.out = last_nand.out
-
-
-class Clock(Component):
     def __init__(self):
-        one = Wire(default=True)
-        nand = Nand(one, Wire())
-        nand.b = nand.out
-        self.out = nand.out
+        self.subcomponents = []
 
-
-class SRLatch(Component):
-    def __init__(self, s: Wire, r: Wire):
-        nand0 = Nand(s, Wire())
-        nand1 = Nand(r, nand0.out)
-        nand0.b = nand1.out
-        self.q = nand0.out
-        self.q_ = nand1.out
-
-
-class FlipFlop(Component):
-    def __init__(self, s: Wire, r: Wire, clock: Wire):
-        nand0 = Nand(s, clock)
-        nand1 = Nand(r, clock)
-        nand2 = Nand(nand0.out, Wire())
-        nand2.out = Wire(nand2, default=False)
-        nand3 = Nand(nand1.out, nand2.out)
-        nand2.b = nand3.out
-        nand3.out = Wire(nand3, default=False)
-        self.q = nand2.out
-        self.q_ = nand3.out
-
-
-def find_nands(components: List[Component]):
-    visited = set()
-    nand_gates = set()
-
-    def _find_nands(obj):
-        if isinstance(obj, (Component, Wire)):
-            if obj in visited:
-                return
-            visited.add(obj)
-            if isinstance(obj, Component):
-                if isinstance(obj, Nand):
-                    nand_gates.add(obj)
-                for _, attr_value in vars(obj).items():
-                    _find_nands(attr_value)
-            elif isinstance(obj, Wire):
-                if obj.origin is not None:
-                    _find_nands(obj.origin)
-        elif isinstance(obj, list):
-            for i in obj:
-                _find_nands(i)
-
-    for c in components:
-        _find_nands(c)
-    return nand_gates
-
-
-class Simulation:
-    def __init__(
-        self,
-        components: Component | List[Component],
-        wire_to_value: Optional[dict] = None,
-    ):
-        if isinstance(components, list):
-            self.components = components
-        else:
-            self.components = [components]
-        self.nand_gates = find_nands(self.components)
-        self.wire_to_value = wire_to_value or {}
-        self.time = 0
-
-    def step(self) -> Simulation:
-        """Update the values of all components in the circuit."""
-        new_wire_to_value = self.wire_to_value.copy()
-        for nand in self.nand_gates:
-            a = self[nand.a]
-            b = self[nand.b]
-            if a is not None and b is not None:
-                new_wire_to_value[nand.out] = not (a and b)
-        self.wire_to_value = new_wire_to_value
-        self.time += 1
+    def __enter__(self):
+        self.previous_context = ComponentContext.current_context
+        ComponentContext.current_context = self
         return self
 
-    def steps(self, steps: int) -> Simulation:
-        for _ in range(steps):
-            self.step()
-        return self
+    def __exit__(self, exc_type, exc_value, traceback):
+        ComponentContext.current_context = self.previous_context
 
-    def __getitem__(self, wire) -> bool:
-        """Return the value of the given wire at the current time."""
-        default = False
-        if wire.default is not None:
-            default = wire.default
-        return self.wire_to_value.get(wire, default)
+    def register(self, component: Component):
+        self.subcomponents.append(component)
 
-    def __setitem__(self, wire, value):
-        """Return the value of the given wire at the current time."""
-        self.wire_to_value[wire] = value
+
+def component(fn: Callable[P, dict[str, Bus]]) -> Callable[P, Component]:
+    @wraps(fn)
+    def wrapper(*args, **kwargs) -> Component:
+        component = Component(name=fn.__name__)
+
+        for name, wire in zip(fn.__code__.co_varnames, args):
+            component.add_input(name, wire)
+
+        with ComponentContext() as context:
+            outputs = fn(*args, **kwargs)
+
+        for subcomponent in context.subcomponents:
+            component.add_subcomponent(subcomponent)
+
+        for name, bus in outputs.items():
+            component.add_output(name, bus)
+
+        return component
+
+    return wrapper
+
+
+def is_elemental(component: Component) -> bool:
+    return len(component.subcomponents) == 0
+
+
+def extract_elemental_components(component: Component) -> list[Component]:
+    elemental_components = []
+    stack = [component]
+
+    while stack:
+        i = stack.pop()
+        if is_elemental(i):
+            elemental_components.append(i)
+        stack.extend(i.subcomponents)
+
+    return elemental_components
