@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import wraps
-from typing import Callable, ParamSpec, TypeVar
+from typing import Callable, ParamSpec, TypeVar, overload
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -101,18 +101,85 @@ def component(fn: Callable[P, dict[str, Bus]]) -> Callable[P, Component]:
     return wrapper
 
 
-def is_elemental(component: Component) -> bool:
-    return len(component.subcomponents) == 0
+class Status:
+    def __init__(self):
+        self.current_values: dict[Wire, bool] = {}
+        self.next_values: dict[Wire, bool] = {}
+
+    @overload
+    def __getitem__(self, item: Wire) -> bool:
+        ...
+
+    @overload
+    def __getitem__(self, item: Bus) -> int:
+        ...
+
+    def __getitem__(self, item: Wire | Bus) -> bool | int:
+        if isinstance(item, Wire):
+            return self.current_values.get(item, False)
+        result = 0
+        for i, wire in enumerate(item.wires):
+            if self.current_values[wire]:
+                result |= 1 << i
+        return result
+
+    @overload
+    def __setitem__(self, key: Wire, value: bool) -> None:
+        ...
+
+    @overload
+    def __setitem__(self, key: Bus, value: int) -> None:
+        ...
+
+    def __setitem__(self, key: Wire | Bus, value: bool | int) -> None:
+        if isinstance(key, Wire):
+            if not isinstance(value, bool):
+                raise TypeError(
+                    "Value must be a bool when setting wire values."
+                )
+            self.next_values[key] = value
+        else:
+            if isinstance(value, bool):
+                raise TypeError(
+                    "Value must be an int when settings bus values."
+                )
+            for i, wire in enumerate(key.wires):
+                self.next_values[wire] = ((1 << i) & value) > 0
+
+    def commit(self):
+        self.current_values.update(self.next_values)
+        self.next_values.clear()
 
 
-def extract_elemental_components(component: Component) -> list[Component]:
-    elemental_components = []
+SimulationFunction = Callable[[Component, Status], None]
+
+
+simulation_registry: dict[str, SimulationFunction] = {}
+
+
+def simulation(
+    fn: Callable,
+) -> Callable[[SimulationFunction], SimulationFunction]:
+    def decorator(sim_func: SimulationFunction) -> SimulationFunction:
+        simulation_registry[fn.__name__] = sim_func
+        return sim_func
+
+    return decorator
+
+
+def has_simulation(component: Component) -> bool:
+    return component.name in simulation_registry
+
+
+def extract_components_with_simulation(component: Component) -> list[Component]:
+    extracted_components = []
     stack = [component]
 
     while stack:
         i = stack.pop()
-        if is_elemental(i):
-            elemental_components.append(i)
-        stack.extend(i.subcomponents)
+        if has_simulation(i):
+            extracted_components.append(i)
+        else:
+            stack.extend(i.subcomponents)
 
-    return elemental_components
+    return extracted_components

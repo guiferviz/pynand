@@ -1,31 +1,29 @@
-from wirednand.core import Component, Wire, extract_elemental_components
+from wirednand.core import (
+    Component,
+    Status,
+    extract_components_with_simulation,
+    simulation_registry,
+)
 
 
 class Simulator:
     def __init__(self, component: Component):
-        self.component = component
-        self.elemental_components = extract_elemental_components(component)
-        assert all(i.name == "Nand" for i in self.elemental_components)
-        wires: dict[Wire, int] = dict()
-        for i in self.elemental_components:
-            for j in i.inputs["a"].wires:
-                wires[j] = False
-            for j in i.inputs["b"].wires:
-                wires[j] = False
-            for j in i.outputs["out"].wires:
-                wires[j] = False
-        self.wires = wires
+        self.root_component = component
+        self.components_to_simulate = extract_components_with_simulation(
+            component
+        )
+        status = Status()
+        for i in self.components_to_simulate:
+            for j in i.inputs.values():
+                status[j] = 0
+            for j in i.outputs.values():
+                status[j] = 0
+        self.status = status
 
     def step(self):
-        outputs: dict[Wire, int] = self.wires.copy()
-        for i in self.elemental_components:
-            a_wires = i.inputs["a"].wires
-            b_wires = i.inputs["b"].wires
-            out_wires = i.outputs["out"].wires
-            for a, b, out in zip(a_wires, b_wires, out_wires):
-                a, b = self.wires[a], self.wires[b]
-                outputs[out] = not (a and b)
-        self.wires = outputs
+        for i in self.components_to_simulate:
+            simulation_registry[i.name](i, self.status)
+        self.status.commit()
 
     def steps(self, n: int):
         for _ in range(n):
