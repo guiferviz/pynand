@@ -9,7 +9,7 @@ def nand(a: Bus, b: Bus) -> dict[str, Bus]:
 
 
 @simulation(nand)
-def nand_simulation(component: Component, status: Status):
+def nand_simulation(component: Component, status: Status) -> None:
     a, b = component.inputs["a"], component.inputs["b"]
     q = component.outputs["q"]
     status[q] = ~(status[a] & status[b])

@@ -65,10 +65,28 @@ indent-width = 4
 
 [tool.ruff.lint]
 select = [
-  "E4",
-  "E7",
-  "E9",
+  # pycodestyle
+  "E",
+  # Pyflakes.
   "F",
-  "B",  # flake8-bugbear.
-  "I",  # isort.
+  # flake8-bugbear.
+  "B",
+  # isort.
+  "I",
+  # flake8-simplify
+  "SIM",
+  # flake8-annotations
+  "ANN",
+  # flake8-commas
+  "COM",
 ]
+ignore = [
+  "E501",   # Line too long
+  "ANN101", # Missing type annotation in `self` parameter. Deprecated and should be removed.
+  "ANN002", # Missing type annotation in `*args`.
+  "ANN003", # Missing type annotation in `**kwargs`.
+  "COM812", # Trailing comma rule conflicts with the ruff formatter.
+]
+
+[tool.ruff.format]
+docstring-code-format = true

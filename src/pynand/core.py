@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 from functools import wraps
+from types import TracebackType
 from typing import Callable, ParamSpec, TypeVar, overload
 
+T = TypeVar("T", bound="ComponentMeta")
 P = ParamSpec("P")
 R = TypeVar("R")
 
 
 class ComponentMeta(type):
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls: type[T], *args, **kwargs) -> T:
         instance = super().__call__(*args, **kwargs)
         if ComponentContext.current_context is not None:
             ComponentContext.current_context.register(instance)
@@ -20,12 +22,12 @@ class Wire:
 
 
 class Bus:
-    def __init__(self, n_wires=1):
+    def __init__(self, n_wires: int = 1) -> None:
         if n_wires <= 0:
             raise ValueError("A bus should have a positive number of wires")
         self.wires = [Wire() for _ in range(n_wires)]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.wires)
 
     def __str__(self) -> str:
@@ -33,22 +35,26 @@ class Bus:
 
 
 class Component(metaclass=ComponentMeta):
-    def __init__(self, name: str, subcomponents: list[Component] | None = None):
+    def __init__(
+        self,
+        name: str,
+        subcomponents: list[Component] | None = None,
+    ) -> None:
         self.name = name
         self.inputs: dict[str, Bus] = {}
         self.outputs: dict[str, Bus] = {}
         self.subcomponents: list[Component] = subcomponents or []
 
-    def add_input(self, name: str, bus: Bus):
+    def add_input(self, name: str, bus: Bus) -> None:
         self.inputs[name] = bus
 
-    def add_output(self, name: str, bus: Bus):
+    def add_output(self, name: str, bus: Bus) -> None:
         self.outputs[name] = bus
 
-    def add_subcomponent(self, subcomponent: Component):
+    def add_subcomponent(self, subcomponent: Component) -> None:
         self.subcomponents.append(subcomponent)
 
-    def __str__(self, level=0) -> str:
+    def __str__(self, level: int = 0) -> str:
         indent = "  " * level
         inputs_str = ", ".join(self.inputs.keys())
         outputs_str = ", ".join(self.outputs.keys())
@@ -64,18 +70,23 @@ class Component(metaclass=ComponentMeta):
 class ComponentContext:
     current_context: ComponentContext | None = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.subcomponents = []
 
-    def __enter__(self):
+    def __enter__(self) -> ComponentContext:
         self.previous_context = ComponentContext.current_context
         ComponentContext.current_context = self
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool | None:
         ComponentContext.current_context = self.previous_context
 
-    def register(self, component: Component):
+    def register(self, component: Component) -> None:
         self.subcomponents.append(component)
 
 
@@ -102,7 +113,7 @@ def component(fn: Callable[P, dict[str, Bus]]) -> Callable[P, Component]:
 
 
 class Status:
-    def __init__(self):
+    def __init__(self) -> None:
         self.current_values: dict[Wire, bool] = {}
         self.next_values: dict[Wire, bool] = {}
 
@@ -131,18 +142,18 @@ class Status:
         if isinstance(key, Wire):
             if not isinstance(value, bool):
                 raise TypeError(
-                    "Value must be a bool when setting wire values."
+                    "Value must be a bool when setting wire values.",
                 )
             self.next_values[key] = value
         else:
             if isinstance(value, bool):
                 raise TypeError(
-                    "Value must be an int when settings bus values."
+                    "Value must be an int when settings bus values.",
                 )
             for i, wire in enumerate(key.wires):
                 self.next_values[wire] = ((1 << i) & value) > 0
 
-    def commit(self):
+    def commit(self) -> None:
         self.current_values.update(self.next_values)
         self.next_values.clear()
 

@@ -11,7 +11,7 @@ def and_(a: Bus, b: Bus) -> dict[str, Bus]:
 
 
 @simulation(and_)
-def and_simulation(component: Component, status: Status):
+def and_simulation(component: Component, status: Status) -> None:
     a, b = component.inputs["a"], component.inputs["b"]
     q = component.outputs["q"]
     status[q] = status[a] & status[b]

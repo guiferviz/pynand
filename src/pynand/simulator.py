@@ -7,10 +7,10 @@ from pynand.core import (
 
 
 class Simulator:
-    def __init__(self, component: Component):
+    def __init__(self, component: Component) -> None:
         self.root_component = component
         self.components_to_simulate = extract_components_with_simulation(
-            component
+            component,
         )
         status = Status()
         for i in self.components_to_simulate:
@@ -20,11 +20,11 @@ class Simulator:
                 status[j] = 0
         self.status = status
 
-    def step(self):
+    def step(self) -> None:
         for i in self.components_to_simulate:
             simulation_registry[i.name](i, self.status)
         self.status.commit()
 
-    def steps(self, n: int):
+    def steps(self, n: int) -> None:
         for _ in range(n):
             self.step()

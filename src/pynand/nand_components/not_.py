@@ -8,7 +8,7 @@ def not_(a: Bus) -> dict[str, Bus]:
 
 
 @simulation(not_)
-def not_simulation(component: Component, status: Status):
+def not_simulation(component: Component, status: Status) -> None:
     a = component.inputs["a"]
     q = component.outputs["q"]
     status[q] = ~status[a]

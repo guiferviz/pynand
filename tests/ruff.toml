@@ -1,0 +1,4 @@
+[lint]
+ignore = [
+  "ANN", # flake8-annotations
+]

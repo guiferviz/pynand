@@ -22,7 +22,18 @@ install:
 	$(POETRY) install --sync
 	$(POETRY) run pre-commit install
 
-format_and_lint:
+format:
+	$(POETRY) run ruff format
+
+lint:
+	$(POETRY) run ruff check --fix
+
+types:
+	$(POETRY) run pyright
+
+check: format lint types
+
+pre_commits:
 	$(POETRY) run pre-commit run --all
 
 test:
