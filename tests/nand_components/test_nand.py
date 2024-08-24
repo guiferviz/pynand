@@ -1,8 +1,8 @@
 import pytest
 
-from wirednand.core import Bus
-from wirednand.nand_components.nand import nand
-from wirednand.simulator import Simulator
+from pynand.core import Bus
+from pynand.nand_components.nand import nand
+from pynand.simulator import Simulator
 
 
 @pytest.mark.parametrize(

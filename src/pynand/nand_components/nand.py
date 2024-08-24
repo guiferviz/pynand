@@ -1,4 +1,4 @@
-from wirednand.core import Bus, Component, Status, component, simulation
+from pynand.core import Bus, Component, Status, component, simulation
 
 
 @component

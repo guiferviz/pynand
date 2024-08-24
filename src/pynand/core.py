@@ -107,12 +107,10 @@ class Status:
         self.next_values: dict[Wire, bool] = {}
 
     @overload
-    def __getitem__(self, item: Wire) -> bool:
-        ...
+    def __getitem__(self, item: Wire) -> bool: ...
 
     @overload
-    def __getitem__(self, item: Bus) -> int:
-        ...
+    def __getitem__(self, item: Bus) -> int: ...
 
     def __getitem__(self, item: Wire | Bus) -> bool | int:
         if isinstance(item, Wire):
@@ -124,12 +122,10 @@ class Status:
         return result
 
     @overload
-    def __setitem__(self, key: Wire, value: bool) -> None:
-        ...
+    def __setitem__(self, key: Wire, value: bool) -> None: ...
 
     @overload
-    def __setitem__(self, key: Bus, value: int) -> None:
-        ...
+    def __setitem__(self, key: Bus, value: int) -> None: ...
 
     def __setitem__(self, key: Wire | Bus, value: bool | int) -> None:
         if isinstance(key, Wire):

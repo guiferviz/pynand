@@ -1,26 +1,24 @@
 [tool.poetry]
-name = "wirednand"
+name = "pynand"
 version = "0.1.0"
 description = "Logic circuit simulator. Building a computer from NAND gates."
-packages = [
-    { include = "wirednand", from = "src" },
-]
+packages = [{ include = "pynand", from = "src" }]
 authors = ["guiferviz <guiferviz@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-keywords = ["wirednand"]
-repository = "https://github.com/guiferviz/wirednand"
+keywords = ["Logic Gates", "Circuits", "Simulation", "NAND Gate"]
+repository = "https://github.com/guiferviz/pynand"
 classifiers = [
-    "Natural Language :: English",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Topic :: Software Development",
+  "Natural Language :: English",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development",
 ]
 
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/guiferviz/wirednand/issues"
-"Source" = "https://github.com/guiferviz/wirednand"
-"Documentation" = "https://guiferviz.github.io/wirednand"
+"Bug Tracker" = "https://github.com/guiferviz/pynand/issues"
+"Source" = "https://github.com/guiferviz/pynand"
+"Documentation" = "https://guiferviz.com/pynand"
 
 [tool.poetry.group.main.dependencies]
 python = "^3.10"
@@ -29,113 +27,48 @@ python = "^3.10"
 pytest = "^7.2.0"
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.10.0"
-pytest-html = "^3.1.1"
+pdbpp = "^0.10.3"
 
-pyright = "^1.1.376"
-ruff = "^0.6.1"
 [tool.poetry.group.lint.dependencies]
 pre-commit = "^2.18.1"
-black = "^22.3.0"
-isort = "^5.10.1"
-flake8 = "^6.0.0"
-pyright = "^1.1.284"
-pdbpp = "^0.10.3"
-mypy = "^0.991"
-flake8-pyproject = "^1.2.1"
-pydocstyle = "^6.1.1"
+pyright = "^1.1.376"
+ruff = "^0.6.1"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^8.4.0"
-mkdocstrings = {extras = ["python"], version = "^0.19.0"}
+mkdocstrings = { extras = ["python"], version = "^0.19.0" }
 mkdocs-charts-plugin = "^0.0.8"
 mkdocs-macros-plugin = "^0.7.0"
 
-[tool.poetry.dependencies]
-networkx = "^3.3"
-matplotlib = "^3.9.2"
-rustworkx = "^0.15.1"
-pydantic = "^2.8.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-"wirednand" = "wirednand.__main__:main"
-
-[tool.black]
-line-length = 80
-
-[tool.isort]
-profile = "black"
-line_length = 80
+"pynand" = "pynand.__main__:main"
 
 [tool.pyright]
 include = ["src"]
 exclude = []
 
-[tool.mypy]
-exclude = []
-plugins = [
-    "pydantic.mypy"
-]
-
-[tool.pydantic-mypy]
-init_forbid_extra = true
-init_typed = true
-warn_required_dynamic_aliases = true
-warn_untyped_fields = false
-
 [tool.coverage.report]
 # Regexes for lines to exclude from coverage
 exclude_lines = [
-    "pragma: no cover",
-    "raise NotImplementedError",
-    "except ImportError",
+  "pragma: no cover",
+  "raise NotImplementedError",
+  "except ImportError",
 ]
 
-[tool.flake8]
-per-file-ignores = [
-    # Imported but unused.
-    "__init__.py:F401",
-]
-exclude = [
-    ".git",
-    "__pycache__",
-]
-extend-ignore = [
-    # Indentation — black handles
-    "E1",
-    "W1",
-    # Whitespace — black handles
-    "E2",
-    "W2",
-    # Blank lines — black handles
-    "E3",
-    "W3",
-    # Imports — isort handles
-    "E4",
-    "W4",
-    # Line length — black handles
-    "E5",
-    "W5",
-]
-max-line-length = 100
-# Print the total number of errors.
-count = true
-# Print the source code generating the error/warning in question.
-show-source = true
-# Count the number of occurrences of each error/warning code and print a report.
-statistics = true
+[tool.ruff]
+line-length = 80
+indent-width = 4
 
-[tool.pydocstyle]
-convention = "google"
-add_ignore = [
-    "D100",  # Missing docstring in public module
-    "D101",  # Missing docstring in public class
-    "D102",  # Missing docstring in public method
-    "D103",  # Missing docstring in public function
-    "D104",  # Missing docstring in public package
-    "D105",  # Missing docstring in magic method (Python dunder method)
-    "D106",  # Missing docstring in public nested class
-    "D107",  # Missing docstring in __init__
+[tool.ruff.lint]
+select = [
+  "E4",
+  "E7",
+  "E9",
+  "F",
+  "B",  # flake8-bugbear.
+  "I",  # isort.
 ]

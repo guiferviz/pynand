@@ -1,7 +1,6 @@
-from wirednand.core import Bus, Component, Status, component, simulation
-
-from .nand import nand
-from .not_ import not_
+from pynand.core import Bus, Component, Status, component, simulation
+from pynand.nand_components.nand import nand
+from pynand.nand_components.not_ import not_
 
 
 @component

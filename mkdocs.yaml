@@ -1,8 +1,8 @@
-site_name: Wired NAND Docs
-site_url: https://guiferviz.github.io/wirednand
+site_name: PyNand Docs
+site_url: https://guiferviz.com/pynand
 site_author: guiferviz
-repo_url: https://github.com/guiferviz/wirednand
-repo_name: Wired NAND
+repo_url: https://github.com/guiferviz/pynand
+repo_name: PyNand
 strict: true
 
 theme:
@@ -86,6 +86,3 @@ nav:
     - FAQ: faq.md
     - Changes: changelog.md
     - Contributing: contributing.md
-    - EP:
-      - eps/ep00.md
-    - Tags: tags.md

@@ -1,4 +1,4 @@
-from wirednand.core import (
+from pynand.core import (
     Component,
     Status,
     extract_components_with_simulation,

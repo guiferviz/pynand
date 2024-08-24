@@ -1,1 +1,1 @@
-"""Unit test package for wirednand."""
+"""Unit test package for PyNand."""

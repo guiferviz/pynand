@@ -8,7 +8,7 @@ build: requirements.txt
 	$(POETRY) build
 
 requirements.txt: pyproject.toml
-	poetry export -f requirements.txt --output requirements.txt --without-hashes
+	$(POETRY) export -f requirements.txt --output requirements.txt --without-hashes
 
 publish: build
 ifdef PYPI_URL
@@ -19,7 +19,7 @@ else
 endif
 
 install:
-	$(POETRY) install
+	$(POETRY) install --sync
 	$(POETRY) run pre-commit install
 
 format_and_lint:
@@ -39,4 +39,4 @@ doc-publish:
 	$(POETRY) run mkdocs gh-deploy --force
 
 doc-serve:
-	mkdocs serve
+	$(POETRY) run mkdocs serve
