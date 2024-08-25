@@ -1,8 +1,7 @@
 import pytest
 
-from pynand.core import Bus
 from pynand.nand_components.nand import nand
-from pynand.simulator import Simulator
+from pynand.helpers import simulate_component_fn
 
 
 @pytest.mark.parametrize(
@@ -14,15 +13,12 @@ from pynand.simulator import Simulator
         [dict(a=1, b=1), dict(q=0)],
     ],
 )
-def test_nand(inputs, outputs):
-    input_buses = {i: Bus() for i in inputs}
-    component = nand(*input_buses.values())
-    simulator = Simulator(component)
-    for k, v in inputs.items():
-        input_bus = input_buses[k]
-        simulator.status[input_bus] = v
-    simulator.status.commit()
-    simulator.step()
-    for k, v in outputs.items():
-        output_bus = component.outputs[k]
-        assert simulator.status[output_bus] == v
+def test_nand_with_single_bit_buses(inputs, outputs):
+    assert simulate_component_fn(nand, inputs) == outputs
+
+
+def test_nand_with_multi_bit_buses():
+    inputs = dict(a=0b1100, b=0b1010)
+    outputs = dict(q=0b0111)
+    actual = simulate_component_fn(nand, inputs, input_bus_sizes=4)
+    assert actual == outputs

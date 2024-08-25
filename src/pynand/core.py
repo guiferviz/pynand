@@ -22,10 +22,13 @@ class Wire:
 
 
 class Bus:
-    def __init__(self, n_wires: int = 1) -> None:
-        if n_wires <= 0:
-            raise ValueError("A bus should have a positive number of wires")
-        self.wires = [Wire() for _ in range(n_wires)]
+    def __init__(self, wires: int | list[Wire] = 1) -> None:
+        if isinstance(wires, int):
+            if wires <= 0:
+                raise ValueError("A bus should have a positive number of wires")
+            self.wires = [Wire() for _ in range(wires)]
+        else:
+            self.wires = wires
 
     def __len__(self) -> int:
         return len(self.wires)
@@ -174,19 +177,66 @@ def simulation(
     return decorator
 
 
-def has_simulation(component: Component) -> bool:
-    return component.name in simulation_registry
+def has_simulation(
+    component: Component, simulation_functions: dict[str, SimulationFunction]
+) -> bool:
+    return component.name in simulation_functions
 
 
-def extract_components_with_simulation(component: Component) -> list[Component]:
+def extract_components_with_simulation(
+    component: Component, simulation_functions: dict[str, SimulationFunction]
+) -> list[Component]:
     extracted_components = []
     stack = [component]
 
     while stack:
         i = stack.pop()
-        if has_simulation(i):
+        if has_simulation(i, simulation_functions):
             extracted_components.append(i)
         else:
             stack.extend(i.subcomponents)
 
     return extracted_components
+
+
+class Simulator:
+    def __init__(
+        self,
+        component: Component,
+        simulation_functions: dict[
+            str, SimulationFunction
+        ] = simulation_registry,
+    ) -> None:
+        self.component = component
+        self.components_to_simulate = extract_components_with_simulation(
+            component, simulation_functions
+        )
+        if not self.components_to_simulate:
+            raise ValueError(
+                "At least one component with simulation function is needed"
+            )
+        status = Status()
+        for i in self.components_to_simulate:
+            for j in i.inputs.values():
+                status[j] = 0
+            for j in i.outputs.values():
+                status[j] = 0
+        self.status = status
+
+    def step(self) -> None:
+        for i in self.components_to_simulate:
+            simulation_registry[i.name](i, self.status)
+        self.status.commit()
+
+    def steps(self, n: int) -> None:
+        for _ in range(n):
+            self.step()
+
+    def set_input_values(self, inputs: dict[str, int]) -> None:
+        for k, v in inputs.items():
+            input_bus = self.component.inputs[k]
+            self.status[input_bus] = v
+        self.status.commit()
+
+    def get_output_values(self) -> dict[str, int]:
+        return {k: self.status[v] for k, v in self.component.outputs.items()}
